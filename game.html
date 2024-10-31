@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naruto Battle Game</title>
+</head>
+<body>
+    <script>
+    //  parent class 
+        class Character {
+            constructor(name, attackName, health) {
+                this.name = name;
+                this.attackName = attackName;
+                this.health = health;
+            }
+            // metode untuk menyerang
+            attack(enemy, damage) {
+                enemy.health -= damage;
+                if (enemy.health < 0) {
+                    // jika darah lawan player kurang dari 0 maka nilainya akan 0
+                    enemy.health = 0;
+                }
+                // membuat alert
+                const message = `${this.name} menyerang ${enemy.name} dengan ${this.attackName}, mengurangi darah ${enemy.name} sebesar ${damage} poin.\nDarah ${enemy.name} sekarang: ${enemy.health}`;
+                alert(message);
+                console.log(message);
+            }
+            // metode untuk mempunyai pelindung 
+            defend() {
+                const Damage = Math.floor(Math.random() * 11);
+                // membuat alert
+                const message = `${this.name} memilih bertahan, mengurangi damage sebesar ${Damage} poin.`;
+                alert(message);
+                console.log(message);
+                return Damage;
+            }
+        }
+
+        //subclass untuk menjalankan parent class nya 
+        class NarutoBattleGame extends Character {
+            constructor() {
+                // membuat instance 
+                super('katrakter', 'jurus', Infinity);
+                this.characters = [
+                    new Character('Naruto', 'Rasengan', 100),
+                    new Character('Sasuke', 'Chidori', 100),
+                    new Character('Gaara', 'Sabaaku', 100),
+                    new Character('Temari', 'Kamaitachi', 100),
+                    new Character('Kakashi', 'Raikiri', 100)
+                ];
+            }
+            // metode untuk memilih karakter
+            selectCharacter(playerNumber) {
+                let choice;
+                do {
+                    choice = parseInt(prompt(`Pemain ${playerNumber}, pilih karakter:\n1. Naruto (Rasengan)\n2. Sasuke (Chidori)\n3. Gaara (Sabaaku)\n4. Temari (Kamaitachi)\n5. Kakashi (Raikiri)\nMasukkan nomor karakter (1-5):`));
+                } while (![1, 2, 3, 4, 5].includes(choice));
+                return this.characters[choice - 1];
+            }
+            // metode untuk memilih opsi menyerang atau perlindungan
+            chooseAttacker(player, enemy) {
+                let attackerChoice;
+                do {
+                    attackerChoice = prompt(`Siapa yang akan menyerang?\n1 untuk ${player.name}\n2 untuk ${enemy.name}:\nMasukkan pilihan (1 atau 2):`);
+                } while (!['1', '2'].includes(attackerChoice));
+                return attackerChoice === '1' ? player : enemy;
+            }
+
+            // metode opsi jika seseorang player memilih defense
+            battleRound(attacker, defender) {
+                const defenderChoice = prompt(`Apakah ${defender.name} akan menyerang atau bertahan?\n1. Serang\n2. Bertahan\nMasukkan pilihan (1 atau 2):`);
+                let damage = Math.floor(Math.random() * 21) + 10;
+
+                if (defenderChoice === '2') {
+                    // memanggil metode defend parent class nya
+                    const Damage = defender.defend(); 
+                    damage -= Damage; 
+                    if (damage < 0) damage = 0;
+                }
+                // memanggil metode parent class nya 
+                attacker.attack(defender, damage); 
+            }
+        // metode untuk hasil akhir pertandingan
+            battle(player, enemy) {
+                while (player.health > 0 && enemy.health > 0) {
+                    const attacker = this.chooseAttacker(player, enemy);
+                    const defender = attacker === player ? enemy : player;
+                    // metode parent class nya
+                    this.battleRound(attacker, defender);
+
+                    if (defender.health === 0) {
+                        const message = `${defender.name} kalah! ${attacker.name} menang!`;
+                        alert(message);
+                        console.log(message);
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Memulai permainan
+        const game = new NarutoBattleGame();
+        const player1 = game.selectCharacter(1);
+        const player2 = game.selectCharacter(2);
+        const message = `Pemain 1: ${player1.name} vs Pemain 2: ${player2.name}`;
+        alert(message);
+        console.log(message);
+        game.battle(player1, player2);
+    </script>
+</body>
+</html>
